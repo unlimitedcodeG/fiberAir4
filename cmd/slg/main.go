@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"fiberAir4/internal/config"
 	"fiberAir4/internal/user"
 	"fiberAir4/pkg/db"
-	"log"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}
 
-	// 启动 Fiber 服务
+	// 启动 Fiber v3 服务
 	app := fiber.New()
 
 	// 路由
@@ -28,7 +30,7 @@ func main() {
 	api.Post("/login", user.LoginHandler)
 
 	// 启动服务
-	addr := ":" + fiber.Itoa(config.Cfg.Server.Port)
+	addr := fmt.Sprintf(":%d", config.Cfg.Server.Port)
 	log.Printf("Starting server at %s...", addr)
 	log.Fatal(app.Listen(addr))
 }

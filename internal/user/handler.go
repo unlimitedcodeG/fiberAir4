@@ -1,7 +1,9 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"encoding/json"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 type req struct {
@@ -9,24 +11,28 @@ type req struct {
 	Password string `json:"password"`
 }
 
-func RegisterHandler(c *fiber.Ctx) error {
+func parseBody[T any](c fiber.Ctx, dst *T) error {
+	return json.Unmarshal(c.Body(), dst)
+}
+
+func RegisterHandler(c fiber.Ctx) error {
 	var r req
-	if err := c.BodyParser(&r); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "invalid request"})
+	if err := parseBody(c, &r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
 	}
 	if err := Register(r.Username, r.Password); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(fiber.Map{"message": "register success"})
 }
 
-func LoginHandler(c *fiber.Ctx) error {
+func LoginHandler(c fiber.Ctx) error {
 	var r req
-	if err := c.BodyParser(&r); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "invalid request"})
+	if err := parseBody(c, &r); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
 	}
 	if err := Login(r.Username, r.Password); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(fiber.Map{"message": "login success"})
 }
