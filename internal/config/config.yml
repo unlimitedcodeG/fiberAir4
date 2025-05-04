@@ -7,3 +7,7 @@ database:
   user: root
   password: 123456
   name: fiber_air
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""

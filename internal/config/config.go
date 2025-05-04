@@ -4,30 +4,43 @@ import (
 	"log"
 	"os"
 
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
-
-type Config struct {
-	Server struct {
-		Port int `yaml:"port"`
-	} `yaml:"server"`
-	Database struct {
-		Host     string `yaml:"host"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Name     string `yaml:"name"`
-	} `yaml:"database"`
-}
 
 var Cfg Config
 
-func Init() {
-	fileData, err := os.ReadFile("internal/config/config.yml")
-	if err != nil {
-		log.Fatalf("failed to read config file: %v", err)
+type Config struct {
+	Database struct {
+		Host     string
+		Port     int
+		User     string
+		Password string
+		Name     string
 	}
-	if err := yaml.Unmarshal(fileData, &Cfg); err != nil {
-		log.Fatalf("failed to unmarshal config: %v", err)
+	Redis struct {
+		Host     string
+		Port     int
+		Password string
+	}
+	Server struct {
+		Port int
+	}
+}
+
+func Init() {
+	// ✅ 允许从环境变量指定 config 路径
+	path := os.Getenv("CFG_PATH")
+	if path == "" {
+		path = "internal/config/config.yml"
+	}
+
+	viper.SetConfigFile(path)
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("❌ failed to read config file: %v", err)
+	}
+
+	if err := viper.Unmarshal(&Cfg); err != nil {
+		log.Fatalf("❌ failed to unmarshal config: %v", err)
 	}
 }

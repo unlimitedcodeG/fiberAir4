@@ -34,5 +34,15 @@ func LoginHandler(c fiber.Ctx) error {
 	if err := Login(r.Username, r.Password); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.JSON(fiber.Map{"message": "login success"})
+
+	// ✅ 登录成功，生成 token
+	token, err := GenerateJWT(r.Username)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed to generate token"})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "login success",
+		"token":   token,
+	})
 }
