@@ -7,6 +7,7 @@ import (
 	"fiberAir4/internal/config"
 	"fiberAir4/internal/user"
 	"fiberAir4/pkg/db"
+	"fiberAir4/pkg/redis"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -17,6 +18,7 @@ func main() {
 
 	// 初始化数据库
 	db.Init()
+	redis.Init() // ✅ 这句不能漏！
 	if err := db.DB.AutoMigrate(&user.User{}); err != nil {
 		log.Fatalf("AutoMigrate failed: %v", err)
 	}

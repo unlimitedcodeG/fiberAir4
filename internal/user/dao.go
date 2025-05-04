@@ -2,26 +2,37 @@ package user
 
 import (
 	"errors"
-	"log" // ✅ 加上这个才能让 log.Printf 正常打印！
 	"fiberAir4/pkg/db"
-	"gorm.io/gorm" // ✅ 必须加这个！
+	"log"
+
+	"gorm.io/gorm"
 )
 
+// 创建新用户
 func CreateUser(user *User) error {
-	log.Println("📥 CreateUser called for:", user.Username)
+	log.Printf("[user.dao] 👉 CreateUser: %s", user.Username)
 	result := db.DB.Create(user)
-	log.Printf("📦 CreateUser affected rows: %d, error: %v\n", result.RowsAffected, result.Error)
+	if result.Error != nil {
+		log.Printf("[user.dao] ❌ 创建失败: %v", result.Error)
+	}
 	return result.Error
 }
 
+// 根据用户名查询
 func GetUserByUsername(username string) (*User, error) {
 	var user User
 	err := db.DB.Where("username = ?", username).First(&user).Error
-	if err != nil {
-		log.Printf("💥 GORM 查询出错: %v", err)
-	}
+
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil // ✅ 用户不存在
+		log.Printf("[user.dao] ❗ 用户不存在: %s", username)
+		return nil, nil
 	}
-	return &user, err // ✅ 查到了 或者其他错误
+
+	if err != nil {
+		log.Printf("[user.dao] 💥 查询错误: %s, err: %v", username, err)
+		return nil, err
+	}
+
+	log.Printf("[user.dao] ✅ 查询成功: %s (id=%d)", user.Username, user.ID)
+	return &user, nil
 }

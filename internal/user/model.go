@@ -1,9 +1,16 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
-	gorm.Model
-	Username string `gorm:"uniqueIndex;size:32;not null"`
-	Password string `gorm:"size:255;not null"` // bcrypt hash
+	ID        int64  `gorm:"primaryKey;autoIncrement" json:"id"`
+	Username  string `gorm:"uniqueIndex;size:64" json:"username"`
+	Password  string `json:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
