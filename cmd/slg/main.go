@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 
+	"fiberAir4/internal/auth"
 	"fiberAir4/internal/config"
 	"fiberAir4/internal/user"
 	"fiberAir4/pkg/db"
-	"fiberAir4/pkg/redis"
+	"fiberAir4/pkg/redis" // 👈 加上这行
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -35,4 +36,17 @@ func main() {
 	addr := fmt.Sprintf(":%d", config.Cfg.Server.Port)
 	log.Printf("Starting server at %s...", addr)
 	log.Fatal(app.Listen(addr))
+
+	// 登录后的接口
+	game := app.Group("/api/game", auth.JWTAuth())
+
+	game.Get("/profile", func(c fiber.Ctx) error {
+		uid := c.Locals("uid").(int64)
+		username := c.Locals("username").(string)
+		return c.JSON(fiber.Map{
+			"uid":      uid,
+			"username": username,
+			"msg":      "你已通过身份验证，欢迎进入游戏！",
+		})
+	})
 }
