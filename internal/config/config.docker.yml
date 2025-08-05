@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+database:
+  host: mysql
+  port: 3306
+  user: fiber_user
+  password: fiber_pass
+  name: fiber_air
+
+redis:
+  host: redis
+  port: 6379
+  password: ""

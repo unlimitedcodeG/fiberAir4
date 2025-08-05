@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"fiberAir4/internal/auth"
 	"fiberAir4/internal/config"
@@ -26,6 +27,15 @@ func main() {
 
 	// 启动 Fiber v3 服务
 	app := fiber.New()
+
+	// 健康检查端点
+	app.Get("/health", func(c fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status":    "ok",
+			"service":   "fiberair4",
+			"timestamp": time.Now().Unix(),
+		})
+	})
 
 	// 路由
 	api := app.Group("/api/user")

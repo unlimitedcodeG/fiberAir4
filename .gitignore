@@ -29,3 +29,15 @@ go.work.sum
 # Build output and temporary files
 tmp/
 *.tmp
+
+# Docker and environment files
+.env
+.env.local
+.env.prod
+*.log
+logs/
+
+# Docker volumes (if using local volumes)
+data/
+mysql_data/
+redis_data/

@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+database:
+  host: mysql
+  port: 3306
+  user: ${MYSQL_USER}
+  password: ${MYSQL_PASSWORD}
+  name: ${MYSQL_DATABASE}
+
+redis:
+  host: redis
+  port: 6379
+  password: ${REDIS_PASSWORD}

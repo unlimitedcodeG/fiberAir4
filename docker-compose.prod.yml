@@ -1,0 +1,95 @@
+version: '3.8'
+
+# 生产环境配置
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: fiberair4:latest
+    container_name: fiberair4-app-prod
+    ports:
+      - "80:8080"
+    environment:
+      - CFG_PATH=/app/internal/config/config.yml
+      - JWT_SECRET=${JWT_SECRET}
+      - GIN_MODE=release
+    volumes:
+      - ./internal/config/config.prod.yml:/app/internal/config/config.yml:ro
+      - ./logs:/app/logs
+    networks:
+      - fiberair4-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mysql:
+    image: mysql:8.0
+    container_name: fiberair4-mysql-prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./scripts/mysql-prod.cnf:/etc/mysql/conf.d/mysql-prod.cnf:ro
+    networks:
+      - fiberair4-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  redis:
+    image: redis:7-alpine
+    container_name: fiberair4-redis-prod
+    volumes:
+      - redis_prod_data:/data
+      - ./scripts/redis-prod.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - fiberair4-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  mysql_prod_data:
+    driver: local
+  redis_prod_data:
+    driver: local
+
+networks:
+  fiberair4-network:
+    driver: bridge
