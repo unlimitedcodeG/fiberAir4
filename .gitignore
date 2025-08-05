@@ -24,3 +24,8 @@ go.work.sum
 # env file
 .env
 .*log
+*.tmp
+
+# Build output and temporary files
+tmp/
+*.tmp
