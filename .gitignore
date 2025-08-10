@@ -28,7 +28,11 @@ go.work.sum
 
 # Build output and temporary files
 tmp/
+tmp/*
 *.tmp
+*.exe
+main
+main.exe
 
 # Docker and environment files
 .env
