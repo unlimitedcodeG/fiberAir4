@@ -42,11 +42,6 @@ func main() {
 	api.Post("/register", user.RegisterHandler)
 	api.Post("/login", user.LoginHandler)
 
-	// 启动服务
-	addr := fmt.Sprintf(":%d", config.Cfg.Server.Port)
-	log.Printf("Starting server at %s...", addr)
-	log.Fatal(app.Listen(addr))
-
 	// 登录后的接口
 	game := app.Group("/api/game", auth.JWTAuth())
 
@@ -59,4 +54,9 @@ func main() {
 			"msg":      "你已通过身份验证，欢迎进入游戏！",
 		})
 	})
+
+	// 启动服务
+	addr := fmt.Sprintf(":%d", config.Cfg.Server.Port)
+	log.Printf("Starting server at %s...", addr)
+	log.Fatal(app.Listen(addr))
 }

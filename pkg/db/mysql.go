@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"fiberAir4/internal/config"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
